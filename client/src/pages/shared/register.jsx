@@ -89,8 +89,8 @@ export function Login() {
 
   return (
     <div className="w-screen h-screen flex justify-center items-center bg-black text-white">
-      <div className="backdrop-blur-xl bg-white/10 border border-white/20 w-full max-w-[400px] rounded-2xl p-8 flex flex-col items-center gap-6 transition-all hover:shadow-[#ff3333]/30">
-        <h1 className="text-2xl font-bold text-[#ff3333]">Welcome Back</h1>
+      <div className="backdrop-blur-xl bg-white/10 border border-white/20 w-full max-w-[400px] rounded-2xl p-8 flex flex-col items-center gap-6 transition-all hover:shadow-[#4242FA]/30">
+        <h1 className="text-2xl font-bold text-[#4242FA]">Welcome Back</h1>
         <p className="text-gray-300 text-sm">Login to continue your journey</p>
 
         <div className="flex justify-around w-3/4 border border-gray-500 rounded-xl p-1">
@@ -98,7 +98,7 @@ export function Login() {
             <span
               key={role}
               className={`px-3 py-1 rounded-lg text-sm font-medium cursor-pointer transition-all ${
-                formData.role === role ? "bg-[#ff3333] text-white" : "text-gray-300 hover:bg-[#ff3333]/20"
+                formData.role === role ? "bg-[#4242FA] text-white" : "text-gray-300 hover:bg-[#4242FA]/20"
               }`}
               onClick={() => setFormData((prev) => ({ ...prev, role }))}
             >
@@ -136,14 +136,14 @@ export function Login() {
           </div>
 
           <div className="text-right">
-            <Link to="/ForgotPassword" className="text-[#ff3333] text-sm hover:underline">
+            <Link to="/ForgotPassword" className="text-[#4242FA] text-sm hover:underline">
               Forgot Password?
             </Link>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-[#ff3333] rounded-lg py-2 mt-2 font-semibold hover:bg-[#ff4d4d] transition-all cursor-pointer flex justify-center items-center"
+            className="w-full bg-[#4242FA] rounded-lg py-2 mt-2 font-semibold hover:bg-[#4242FA]/80 transition-all cursor-pointer flex justify-center items-center"
             disabled={loading}
           >
             {loading ? <Loader /> : "Login"}
@@ -167,7 +167,7 @@ export function Login() {
 
         <p className="text-gray-400 text-sm">
           Don’t have an account?{" "}
-          <Link to="/signup" className="text-[#ff3333] font-semibold hover:underline cursor-pointer">
+          <Link to="/signup" className="text-[#4242FA] font-semibold hover:underline cursor-pointer">
             Sign up
           </Link>
         </p>
@@ -230,8 +230,8 @@ export function Signup() {
 
   return (
     <div className="w-screen h-screen flex justify-center items-center bg-black to-[#1a0000] text-white">
-      <div className="bg-white/10 border border-white/20 w-full max-w-[400px] rounded-2xl p-8 flex flex-col items-center gap-6 transition-all hover:shadow-[#ff3333]/30">
-        <h1 className="text-2xl font-bold text-[#ff3333]">Create Account</h1>
+      <div className="bg-white/10 border border-white/20 w-full max-w-[400px] rounded-2xl p-8 flex flex-col items-center gap-6 transition-all hover:shadow-[#4242FA]/30">
+        <h1 className="text-2xl font-bold text-[#4242FA]">Create Account</h1>
         <p className="text-gray-300 text-sm">Join us today!</p>
 
         <div className="flex justify-around w-3/4 border border-gray-500 rounded-xl p-1">
@@ -239,7 +239,7 @@ export function Signup() {
             <span
               key={role}
               className={`px-3 py-1 rounded-lg text-sm font-medium cursor-pointer transition-all ${
-                formData.role === role ? "bg-[#ff3333] text-white" : "text-gray-300 hover:bg-[#ff3333]/20"
+                formData.role === role ? "bg-[#4242FA] text-white" : "text-gray-300 hover:bg-[#4242FA]/20"
               }`}
               onClick={() => setFormData((prev) => ({ ...prev, role }))}
             >
@@ -284,7 +284,7 @@ export function Signup() {
 
           <button
             type="submit"
-            className="w-full bg-[#ff3333] rounded-lg py-2 mt-2 font-semibold hover:bg-[#ff4d4d] transition-all flex justify-center items-center"
+            className="w-full bg-[#4242FA] rounded-lg py-2 mt-2 font-semibold hover:bg-[#4242FA]/80  transition-all flex justify-center items-center"
             disabled={loading}
           >
             {loading ? <Loader /> : "Sign Up"}
@@ -322,7 +322,7 @@ export function Signup() {
 
         <p className="text-gray-400 text-sm">
           Already have an account?{" "}
-          <Link to="/login" className="text-[#ff3333] font-semibold hover:underline">
+          <Link to="/login" className="text-[#4242FA] font-semibold hover:underline">
             Login
           </Link>
         </p>
