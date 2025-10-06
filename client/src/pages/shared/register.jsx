@@ -43,7 +43,15 @@ export function Login() {
           }
           setUser(res.data.user);
           localStorage.setItem("token", res.data.token);
-          navigate(formData.role !== "client" ? `/${formData.role}/` : from, { replace: true });
+          navigate(
+          res.data.user.role === "admin"
+           ? "/admin"
+            : res.data.user.role === "vendor"
+             ? "/vendor"
+             : from,
+             { replace: true }
+           );
+
         }
       })
       .catch((err) => toast.error(err.response?.data?.message || "Login failed"));
