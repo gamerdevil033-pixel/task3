@@ -1,0 +1,74 @@
+*{
+  font-family:poppins;
+  margin:0;
+  box-sizing : border-box;
+  scrollbar-width: 0px;
+}
+
+
+body {
+  overflow-x: hidden;
+}
+
+.active{
+background-color:#FFFFFF ;
+color:black;
+}
+
+.neuton{
+   font-family: "Neuton"
+}
+
+.neon-border {
+  border: 1px solid white; 
+  box-shadow: 0 0 1px #fff, 
+              0 0 2px #fff,
+              0 0 3px #4242FA, 
+              0 0 7px #4242FA, 
+              0 0 7px #4242FA; 
+  border-radius: 20px; 
+}
+
+
+.backgroundDiv{
+    width:100vw;
+    padding-top:30px;
+    margin-top :46px;
+    overflow-x:hidden;
+    background:#050301;
+}
+
+.container{
+    margin-top:30px;
+    width:90%;
+    max-width:1100px;
+    height:auto;
+    margin :auto;
+    overflow:hidden;
+    padding-bottom:30px;
+    background:#080502;;
+}
+
+
+.btn{
+ padding:4px 8px;
+ border-radius:15px;
+ border:2px solid rgb(122, 117, 117);
+ cursor:pointer;
+ user-select:none;
+ transition:all 500 linear 0s;
+}
+
+.btn:hover{
+border:2px solid white;
+}
+
+.btn:active{
+background-color: #4242FA;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

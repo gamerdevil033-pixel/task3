@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Booking Confirmation</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { color: #444; }
+    .details { margin-top: 20px; }
+    .label { font-weight: bold; }
+    .qr { margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <h1>Hello {{user}},</h1>
+  <p>Thanks for booking your {{purpose}} ticket with us!</p>
+  <p><span class="label">Amount Paid:</span> ₹{{amount}}</p>
+
+  <div class="details">
+    {{#if (eq purpose "movie")}}
+      <p><span class="label">Movie:</span> {{metaData.movie}}</p>
+      <p><span class="label">Theater:</span> {{metaData.theater}}</p>
+      <p><span class="label">Show Time:</span> {{metaData.slot}} on {{metaData.date}}</p>
+      <p><span class="label">Seats:</span> {{#each metaData.seatsBooked}}{{this}} {{/each}}</p>
+    {{else if (eq purpose "concert")}}
+      <p><span class="label">Concert Name:</span> {{metaData.concertName}}</p>
+      <p><span class="label">Venue:</span> {{metaData.venue}}</p>
+      <p><span class="label">Time:</span> {{metaData.slot}} on {{metaData.date}}</p>
+    {{else if (eq purpose "train")}}
+      <p><span class="label">Train Name:</span> {{metaData.trainName}}</p>
+      <p><span class="label">Departure:</span> {{metaData.departure}} at {{metaData.departureTime}}</p>
+      <p><span class="label">Arrival:</span> {{metaData.arrival}} at {{metaData.arrivalTime}}</p>
+      <p><span class="label">Coach/Seat:</span> {{metaData.coach}} - {{metaData.seat}}</p>
+    {{/if}}
+  </div>
+
+  <div class="qr">
+    <p><strong>Scan QR Code at Entry:</strong></p>
+    <img src="{{qrCode}}" alt="QR Code" width="200" />
+  </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+# === Root ===
+node_modules/
+.env
+.DS_Store
+*.log
+
+
+client/node_modules/
+client/dist/
+client/.env
+client/.vite
+client/.DS_Store
+
+
+client/.vscode/
+
+
+server/node_modules/
+server/.env
+server/.DS_Store
+server/debug.log
+server/npm-debug.log*
+
+# Optional: VS Code settings
+server/.vscode/
