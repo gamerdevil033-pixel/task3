@@ -45,34 +45,51 @@ export const AuthProvider = ({ children }) => {
       .catch(err => {});
   }
 
-  const getLinkStatus = (user,setLoading,setPayData) =>{
-    if(user && localStorage.getItem('link_id')){
-      console.log('hello')
-      axios
-          .get(`${BASE_URL}/payment/verify?link_id=${localStorage.getItem('link_id')}`).then((res)=>{
-            console.log(res)
 
-            if(res.data.status === 'PAID'){
-        axios
-            .post(`${BASE_URL}/email/invoice?email=${user?.email}`,res.data)
-            .then((res)=>{
-              console.log('pdf send successfully')
-            })
-          }
+const getLinkStatus = async (user, setLoading, setPayData, navigate) => {
+  if (!user) {
+    console.log('No user found, exiting getLinkStatus');
+    setLoading(false);
+    return;
+  }
 
-            if(res.data.status==='PAID' || res.data.status==='FAILED'){
-              console.log('beforeRemoved')
-              localStorage.removeItem('link_id');
-              console.log(res.data)
-              setPayData(res.data)
-              setLoading(false)
-            }
-          }).catch(err=>console.log(err))
-    } else {
-      location.href=CLIENT_URL;
+  const linkId = localStorage.getItem('link_id');
+  if (!linkId) {
+    console.log('No link_id found in localStorage, navigating home');
+    setLoading(false);
+    navigate('/home');
+    return;
+  }
+
+  setLoading(true);
+  console.log('Starting payment verification for linkId:', linkId);
+
+  try {
+    const { data } = await axios.get(`${BASE_URL}/payment/verify?link_id=${linkId}`);
+
+    console.log('Payment verification data:', data);
+
+    if (data.status === 'PAID') {
+      await axios.post(`${BASE_URL}/email/invoice?email=${user.email}`, data);
+      console.log('Invoice sent successfully');
     }
 
+    if (['PAID', 'FAILED'].includes(data.status)) {
+      localStorage.removeItem('link_id');
+      setPayData(data);
+    } else {
+      setPayData({});
+    }
+  } catch (error) {
+    console.error('Payment verification error:', error);
+    setPayData({ status: 'ERROR', message: 'Failed to verify payment. Please try again.' });
+  } finally {
+    console.log('Payment verification complete, stopping loader');
+    setLoading(false);
   }
+};
+
+
 
    const createLink = (body) => {
     axios
@@ -84,34 +101,33 @@ export const AuthProvider = ({ children }) => {
       })
   }
 
-    useEffect(()=>{
-    if (!user) {
-      console.log('entered')
-      const token = localStorage.getItem('token');
-      if (token) {
-        console.log('token exists')
-        axios
-          .get(`${BASE_URL}/auth/verify`, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          })
-          .then(res => {
-          console.log(res);
-          if(!res.data[0].isSuspended){
-          setUser(res.data[0]);setAuthLoading(false)
+useEffect(() => {
+  if (!user) {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios
+        .get(`${BASE_URL}/auth/verify`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          if (!res.data[0].isSuspended) {
+            setUser(res.data[0]);
           }
-          }).catch(err=>{
-            console.log(err)
-            if(err.status==401){
-              setAuthMessage('Token Expired')
-              logout();
-            }
-            setAuthLoading(false)
-          })
-      } else{setAuthLoading(false)};
+        })
+        .catch((err) => {
+          if (err.response?.status === 401) {
+            setAuthMessage('Token Expired');
+            logout();
+          }
+        })
+        .finally(() => setAuthLoading(false)); // MUST be called always
+    } else {
+      setAuthLoading(false); // no token, so no user
     }
-  },[]);
+  }
+}, []);
+
+
 
   return (
     <authContext.Provider value={{user,setUser,logout,authLoading,updateUser,createLink,getLinkStatus,authMessage,refresh,setRefresh}}>

@@ -1,13 +1,11 @@
 import axios from 'axios'
-import { useState, useEffect, useContext, createContext } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import '../../App.css'
 
 import Loader from '../../components/loader.jsx'
 import { MoviesContainer } from '../../components/moviesContainer.jsx'
 import { authContext } from '../../contexts/authContext.jsx'
-
-export const dataContext = createContext()
 
 let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
 
@@ -24,30 +22,44 @@ export function Home() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    let cancelToken = axios.CancelToken.source()
     setData(null)
     setLoading(true)
 
     const fetchData = async () => {
       try {
+        let res
         if (currentOption === 'movies') {
-          const res = await axios.get(`${BASE_URL}/movie/find?fields=_id,genre,poster,type`)
-          setData(res.data)
+          res = await axios.get(`${BASE_URL}/movie/find?fields=_id,genre,poster,type`, {
+            cancelToken: cancelToken.token
+          })
         } else if (currentOption === 'concerts') {
-          const res = await axios.get(`${BASE_URL}/concert/find?fields=_id,genre,poster,type`)
-          setData(res.data)
+          res = await axios.get(`${BASE_URL}/concert/find?fields=_id,genre,poster,type`, {
+            cancelToken: cancelToken.token
+          })
         } else {
-          const res = await axios.get(`${BASE_URL}/train/find`)
-          setData(res.data)
+          res = await axios.get(`${BASE_URL}/train/find`, {
+            cancelToken: cancelToken.token
+          })
         }
+        setData(res.data)
       } catch (err) {
-        console.error(err)
-        setData([])
+        if (axios.isCancel(err)) {
+          console.log('Request canceled', err.message)
+        } else {
+          console.error(err)
+          setData([])
+        }
       } finally {
-        setTimeout(() => setLoading(false), 1000)
+        setLoading(false)
       }
     }
 
     fetchData()
+
+    return () => {
+      cancelToken.cancel('Operation canceled by the user.')
+    }
   }, [currentOption])
 
   return (
@@ -93,6 +105,7 @@ export function Home() {
     </div>
   )
 }
+
 
 const TrainContent = ({ loading, data }) => {
   const [from, setFrom] = useState('')
