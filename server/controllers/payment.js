@@ -63,7 +63,7 @@ async function createPaymentLink(req, res) {
   }
 }
 
-async function verifyPayment(req, r) {
+async function verifyPayment(req, res) {
   let { link_id } = req.query;
 
   try {
@@ -71,67 +71,75 @@ async function verifyPayment(req, r) {
       headers: {
         'x-api-version': '2025-01-01',
         'x-client-id': process.env.CASHFREE_CLIENT_ID,
-        'x-client-secret': process.env.CLIENT_SECRET
+        'x-client-secret': process.env.CASHFREE_CLIENT_SECRET 
       }
     };
 
-    axios.get(`https://sandbox.cashfree.com/pg/links/${link_id}`, options)
-      .then(res => {
+    const response = await axios.get(`https://sandbox.cashfree.com/pg/links/${link_id}`, options);
+    const data = response.data;
 
-           paymentRefModel.findOneAndUpdate({ link_id: res.data.link_id },
-         { $set: { status: 'PAID' } },
-         { new: true }
-          ).lean().then((d)=>{
+   
+    const d = await paymentRefModel.findOneAndUpdate(
+      { link_id: data.link_id },
+      { $set: { status: 'PAID' } },
+      { new: true }
+    ).lean();
 
-        let status = res.data.link_status;
-            if (status === 'ACTIVE' || status === 'EXPIRED') {
-          status = 'FAILED'
+    if (!d) {
+      return res.status(404).json({ error: 'Payment reference not found' });
+    }
+
+    let status = data.link_status;
+    if (status === 'ACTIVE' || status === 'EXPIRED') {
+      status = 'FAILED';
+    }
+
+    let body = { ...d, status };
+
+    if (status === 'PAID' || status === 'FAILED') {
+      const transaction = await transactionModel.insertOne(body);
+
+      const obj = {
+        transactionId: transaction._id,
+        seatsBooked: d.metaData.seatsBooked,
+        BookedBy: d.user
+      };
+
+      await userModel.updateOne({ _id: d.user }, { $push: { myTransactions: transaction._id } });
+
+      if (status === 'PAID') {
+        if (d.vendor) {
+          await userModel.findOneAndUpdate(
+            { _id: d.vendor },
+            { $push: { myTransactions: transaction._id }, $inc: { amountAvailable: data.link_amount } },
+            { new: true }
+          );
         }
 
-
-        console.log('get link',d);
-
-        let body = {
-          ...d,
-          status:status,
+        if (d.purpose === 'movie') {
+          await movieShowModel.findOneAndUpdate(
+            { _id: d.metaData.showId },
+            { $push: { ticketsBooked: obj }, $inc: { ticketsAvailable: -d.metaData.seatsBooked.length } },
+            { new: true }
+          );
+        } else if (d.purpose === 'concert') {
+          await concertShowModel.findOneAndUpdate(
+            { _id: d.metaData.showId },
+            { $push: { ticketsBooked: obj }, $inc: { ticketsAvailable: -d.metaData.seatsBooked.length } },
+            { new: true }
+          );
+        } else {
+          console.log('train');
         }
+      }
+    }
 
-
-
-        if (status === 'PAID' || status === 'FAILED') {
-
-
-         transactionModel.insertOne(body).then((r1) => {
-
-            let obj = {
-          transactionId : r1._id,
-          seatsBooked : d.metaData.seatsBooked,
-          BookedBy : d.user
-        }
-  
-          userModel.updateOne({ _id: d.user }, { $push: { "myTransactions": r1._id } })
-          .then((r2) => {
-                if (status === 'PAID') {
-                  console.log('vendor',d.vendor)
-
-                   userModel.findOneAndUpdate({ _id: d.vendor }, { $push: { "myTransactions": r1._id },$inc: {amountAvailable:res.data.link_amount} }, { new: true }).then((r3) => { console.log('vendor updated successfully',r3); }).catch((err) => { console.log('error in money to vendor',err) })
-
-                  if (d.purpose === 'movie') {
-                    movieShowModel.findOneAndUpdate({ _id: d.metaData.showId }, { $push: { "ticketsBooked": obj },$inc:{ticketsAvailable:-d.metaData.seatsBooked.length} }, { new: true }).then((r4) => { console.log('show updated successfully',r4); }).catch((err) => { console.log('error in updating show',err) })
-                  } else if (d.purpose === 'concert') {
-                    concertShowModel.findOneAndUpdate({ _id: d.metaData.showId }, { $push: { "ticketsBooked": obj },$inc:{ticketsAvailable:-d.metaData.seatsBooked.length} }, { new: true }).then((r4) => { console.log('show updated successfully',r4); }).catch((err) => { console.log('error in updating show',err) })
-                  } else{console.log('train')}
-                }
-              }).catch((err) => { console.log('error in updating user',err)})}).catch((err) => { console.log('error in adding transaction',err) })
-        }
-
-         r.status(200).json({ status: status,...d})
-        })
-      })
-      .catch(err => console.error(err.response.data));
+    return res.status(200).json({ status, ...d });
   } catch (err) {
-    r.status(401).json(err)
+    console.error('Error verifying payment:', err.response?.data || err.message);
+    return res.status(500).json({ error: 'Failed to verify payment' });
   }
 }
+
 
 module.exports = { createPaymentLink, verifyPayment };

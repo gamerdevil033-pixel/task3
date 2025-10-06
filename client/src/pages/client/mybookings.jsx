@@ -88,7 +88,7 @@ function BookingsElement({transaction,cancelTicket}){
 
   function downloadHandler(link_id){
     console.log(link_id)
-   axios.get(`http://localhost:5000/pdf/download?link_id=${link_id}`,{
+   axios.get(`${BASE_URL}/pdf/download?link_id=${link_id}`,{
     responseType: 'arraybuffer'
    }).then(res=>{
     const url = URL.createObjectURL(new Blob([res.data],{type:'application/pdf'}))
