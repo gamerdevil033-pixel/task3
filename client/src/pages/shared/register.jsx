@@ -12,6 +12,11 @@ import { authContext } from "../../contexts/authContext";
 
 let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL;
 
+function Loader() {
+  return (
+    <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6"></div>
+  );
+}
 
 export function Login() {
   const { user, setUser } = useContext(authContext);
@@ -23,6 +28,7 @@ export function Login() {
   const from = location.state?.from || "/";
   const params = new URLSearchParams(window.location.search);
   const token = params.get("token");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -33,9 +39,11 @@ export function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     axios
       .post(`${BASE_URL}/auth/login`, formData)
       .then((res) => {
+        setLoading(false);
         if (res.data.token) {
           if (res.data.user.isSuspended) {
             toast.error("Your account is suspended");
@@ -44,17 +52,19 @@ export function Login() {
           setUser(res.data.user);
           localStorage.setItem("token", res.data.token);
           navigate(
-          res.data.user.role === "admin"
-           ? "/admin"
-            : res.data.user.role === "vendor"
-             ? "/vendor"
-             : from,
-             { replace: true }
-           );
-
+            res.data.user.role === "admin"
+              ? "/admin"
+              : res.data.user.role === "vendor"
+              ? "/vendor"
+              : from,
+            { replace: true }
+          );
         }
       })
-      .catch((err) => toast.error(err.response?.data?.message || "Login failed"));
+      .catch((err) => {
+        setLoading(false);
+        toast.error(err.response?.data?.message || "Login failed");
+      });
   };
 
   const googleLogin = () => {
@@ -83,7 +93,6 @@ export function Login() {
         <h1 className="text-2xl font-bold text-[#ff3333]">Welcome Back</h1>
         <p className="text-gray-300 text-sm">Login to continue your journey</p>
 
-  
         <div className="flex justify-around w-3/4 border border-gray-500 rounded-xl p-1">
           {roles.map((role) => (
             <span
@@ -134,9 +143,10 @@ export function Login() {
 
           <button
             type="submit"
-            className="w-full bg-[#ff3333] rounded-lg py-2 mt-2 font-semibold hover:bg-[#ff4d4d] transition-all"
+            className="w-full bg-[#ff3333] rounded-lg py-2 mt-2 font-semibold hover:bg-[#ff4d4d] transition-all cursor-pointer flex justify-center items-center"
+            disabled={loading}
           >
-            Login
+            {loading ? <Loader /> : "Login"}
           </button>
         </form>
 
@@ -157,7 +167,7 @@ export function Login() {
 
         <p className="text-gray-400 text-sm">
           Don’t have an account?{" "}
-          <Link to="/signup" className="text-[#ff3333] font-semibold hover:underline">
+          <Link to="/signup" className="text-[#ff3333] font-semibold hover:underline cursor-pointer">
             Sign up
           </Link>
         </p>
@@ -167,7 +177,6 @@ export function Login() {
   );
 }
 
-
 export function Signup() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(authContext);
@@ -176,6 +185,7 @@ export function Signup() {
   const roles = ["client", "vendor"];
   const location = useLocation();
   const from = location.state?.from || "/";
+  const [loading, setLoading] = useState(false);
 
   const validatePassword = (password) => {
     const errors = [];
@@ -199,16 +209,21 @@ export function Signup() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     axios
       .post(`${BASE_URL}/auth/register`, formData)
       .then((res) => {
+        setLoading(false);
         if (res.data.token) {
           setUser(res.data.user);
           localStorage.setItem("token", res.data.token);
           navigate(formData.role !== "client" ? `/${formData.role}/` : from, { replace: true });
         }
       })
-      .catch((err) => toast.error(err.response?.data?.message || "Signup failed"));
+      .catch((err) => {
+        setLoading(false);
+        toast.error(err.response?.data?.message || "Signup failed");
+      });
   };
 
   if (user) return <Navigate to={from} replace />;
@@ -269,9 +284,10 @@ export function Signup() {
 
           <button
             type="submit"
-            className="w-full bg-[#ff3333] rounded-lg py-2 mt-2 font-semibold hover:bg-[#ff4d4d] transition-all"
+            className="w-full bg-[#ff3333] rounded-lg py-2 mt-2 font-semibold hover:bg-[#ff4d4d] transition-all flex justify-center items-center"
+            disabled={loading}
           >
-            Sign Up
+            {loading ? <Loader /> : "Sign Up"}
           </button>
         </form>
 
@@ -284,7 +300,7 @@ export function Signup() {
             className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
             onClick={() => {
               const CLIENT_ID = "486170631932-5s4abs9lgv958ptc06ho5705r50i2ccb.apps.googleusercontent.com";
-              const REDIRECT_URI = "${BASE_URL}/auth/google/callback";
+              const REDIRECT_URI = `${BASE_URL}/auth/google/callback`;
               const SCOPE = "openid email profile";
               window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${encodeURIComponent(
                 SCOPE
@@ -295,7 +311,7 @@ export function Signup() {
             className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
             onClick={() => {
               const CLIENT_ID = "lAOrfPy9uph9nGYe";
-              const REDIRECT_URI = "${BASE_URL}/auth/dauth/callback";
+              const REDIRECT_URI = `${BASE_URL}/auth/dauth/callback`;
               const SCOPE = "email+user+profile+openid";
               window.location.href = `https://auth.delta.nitt.edu/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${encodeURIComponent(
                 SCOPE

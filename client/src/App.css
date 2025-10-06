@@ -5,6 +5,17 @@
   scrollbar-width: 0px;
 }
 
+.loader {
+  border-top-color: #ff3333;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 
 body {
   overflow-x: hidden;
