@@ -12,6 +12,7 @@ import { authContext } from "../../contexts/authContext";
 
 let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL;
 
+
 export function Login() {
   const { user, setUser } = useContext(authContext);
   const [showPassword, setShowPassword] = useState(false);
@@ -50,7 +51,7 @@ export function Login() {
 
   const googleLogin = () => {
     const CLIENT_ID = "486170631932-5s4abs9lgv958ptc06ho5705r50i2ccb.apps.googleusercontent.com";
-    const REDIRECT_URI = "http://localhost:5000/auth/google/callback";
+    const REDIRECT_URI = `${BASE_URL}/auth/google/callback`;
     const SCOPE = "openid email profile";
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${encodeURIComponent(
       SCOPE
@@ -59,7 +60,7 @@ export function Login() {
 
   const dauthLogin = () => {
     const CLIENT_ID = "lAOrfPy9uph9nGYe";
-    const REDIRECT_URI = "http://localhost:5000/auth/dauth/callback";
+    const REDIRECT_URI = `${BASE_URL}/auth/dauth/callback`;
     const SCOPE = "email+user+profile+openid";
     window.location.href = `https://auth.delta.nitt.edu/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${encodeURIComponent(
       SCOPE
@@ -275,7 +276,7 @@ export function Signup() {
             className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
             onClick={() => {
               const CLIENT_ID = "486170631932-5s4abs9lgv958ptc06ho5705r50i2ccb.apps.googleusercontent.com";
-              const REDIRECT_URI = "http://localhost:5000/auth/google/callback";
+              const REDIRECT_URI = "${BASE_URL}/auth/google/callback";
               const SCOPE = "openid email profile";
               window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${encodeURIComponent(
                 SCOPE
@@ -286,7 +287,7 @@ export function Signup() {
             className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
             onClick={() => {
               const CLIENT_ID = "lAOrfPy9uph9nGYe";
-              const REDIRECT_URI = "http://localhost:5000/auth/dauth/callback";
+              const REDIRECT_URI = "${BASE_URL}/auth/dauth/callback";
               const SCOPE = "email+user+profile+openid";
               window.location.href = `https://auth.delta.nitt.edu/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${encodeURIComponent(
                 SCOPE
