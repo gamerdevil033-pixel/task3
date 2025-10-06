@@ -339,18 +339,23 @@ function EntityContainer (props) {
 
 export function ShowsCard (props) {
   let { show } = props
+  const poster = Array.isArray(show?.entityData) && show.entityData.length > 0 
+    ? show.entityData[0].poster 
+    : 'https://res.cloudinary.com/diizmtj04/image/upload/v1751881581/default_poster_payucm.jpg'
+
   return (
     <div className='cardContainer cursor-pointer'>
       <div className='imageContainer overflow-hidden rounded-xl h-[185px] w-[130px] md:h-[285px] md:w-[200px] border-[#636363] hover:border-white border-2'>
-          <img
-            src={show?.entityData[0]?.poster}
-            draggable='false'
-            className='transition duration-500 ease-in-out hover:scale-105'
-          />
+        <img
+          src={poster}
+          draggable='false'
+          className='transition duration-500 ease-in-out hover:scale-105'
+        />
       </div>
     </div>
   )
 }
+
 
 
  
