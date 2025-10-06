@@ -1,10 +1,4 @@
-import axios from 'axios'
 
-import { useParams, useLocation, useNavigate,Link } from 'react-router-dom'
-import { useState, useEffect, useContext } from 'react'
-
-import Loader from '../../components/loader.jsx'
-import { authContext } from '../../contexts/authContext.jsx'
 
 let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
 
